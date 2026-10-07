@@ -6,7 +6,7 @@ A [pi](https://shittycodingagent.ai/) provider extension that connects pi to the
 
 Kiro gives you a strong free model menu, but pi needs a provider that speaks Kiro's auth, model catalog, and streaming protocol cleanly. `pi-provider-kiro` handles that bridge, including:
 
-- AWS Builder ID, IAM Identity Center, Google, GitHub, and enterprise external IdP (OIDC) login flows
+- AWS Builder ID, IAM Identity Center, Google, GitHub (headless device flow), and enterprise external IdP (OIDC) login flows
 - shared credentials from an existing `kiro-cli` session when available
 - reasoning-aware streaming
 - region-aware model filtering so pi only shows models your Kiro region can actually use
@@ -41,6 +41,22 @@ If your organization uses an external identity provider (e.g. Okta) through Kiro
 `kiro-cli login` and the provider reuses that session — no separate pi login needed.
 
 If you already use [kiro-cli](https://kiro.dev), the provider can reuse those credentials instead of forcing a second login.
+
+### Headless / remote login (SSH, containers, JupyterLab)
+
+For Google or GitHub on a machine with no browser, pick **Google (device flow)** or
+**GitHub (device flow)** in the login menu:
+
+```text
+/login kiro   →  pick "Google (device flow)"
+
+URL:  https://app.kiro.dev/account/device?user_code=XXXX-XXXX&login_provider=Google
+Code: XXXX-XXXX  —  open the URL on any device (phone, laptop, another tab) and confirm
+```
+
+The flow talks to Kiro's social auth service directly — no localhost callback and no
+`kiro-cli` install required. Use **Web Login** instead when the browser runs on the
+same machine as pi.
 
 ## Models
 
