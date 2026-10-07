@@ -28,6 +28,7 @@ import {
   loginKiroWithApiKey,
   SSO_SCOPES,
 } from "./oauth.js";
+import { runSocialDeviceFlow } from "./social-device-flow.js";
 
 const oidcHeaders = (): Record<string, string> => ({
   "Content-Type": "application/json",
@@ -109,6 +110,10 @@ export async function interactiveLogin(
             return loginViaKiroCli(mergedCallbacks, "github");
           case "personal":
             return runSocialLoginFlow(mergedCallbacks);
+          case "google-device":
+            return runSocialDeviceFlow(mergedCallbacks, "google");
+          case "github-device":
+            return runSocialDeviceFlow(mergedCallbacks, "github");
           case "idc":
             if (choice.region) {
               return runDeviceCodeFlow(mergedCallbacks, choice.startUrl, choice.region);

@@ -14,6 +14,8 @@ vi.mock("../src/kiro-cli.js", () => ({
 
 vi.mock("node:child_process", () => ({ execFileSync: vi.fn() }));
 
+vi.mock("../src/social-device-flow.js", () => ({ runSocialDeviceFlow: vi.fn() }));
+
 // Mock login-ui — no ctx available in tests, return null to exercise fallback
 vi.mock("../src/login-ui.js", () => ({
   showLoginUI: vi.fn(() => Promise.resolve(null)),
@@ -111,6 +113,42 @@ describe("Feature 10: Interactive Login", () => {
         authMethod: "desktop",
       });
       expect(((await interactiveLogin(makeCallbacks(""))) as KiroCredentials).authMethod).toBe("desktop");
+    });
+
+    it("TUI: google-device → native device flow (headless)", async () => {
+      const { showLoginUI } = await import("../src/login-ui.js");
+      vi.mocked(showLoginUI).mockResolvedValueOnce({ method: "google-device" });
+      const { runSocialDeviceFlow } = await import("../src/social-device-flow.js");
+      vi.mocked(runSocialDeviceFlow).mockResolvedValueOnce({
+        refresh: "rt|desktop",
+        access: "at",
+        expires: Date.now() + 3600000,
+        clientId: "",
+        clientSecret: "",
+        region: "us-east-1",
+        authMethod: "desktop",
+      });
+      const creds = (await interactiveLogin(makeCallbacks(""))) as KiroCredentials;
+      expect(vi.mocked(runSocialDeviceFlow)).toHaveBeenCalledWith(expect.anything(), "google");
+      expect(creds.authMethod).toBe("desktop");
+    });
+
+    it("TUI: github-device → native device flow (headless)", async () => {
+      const { showLoginUI } = await import("../src/login-ui.js");
+      vi.mocked(showLoginUI).mockResolvedValueOnce({ method: "github-device" });
+      const { runSocialDeviceFlow } = await import("../src/social-device-flow.js");
+      vi.mocked(runSocialDeviceFlow).mockResolvedValueOnce({
+        refresh: "rt|desktop",
+        access: "at",
+        expires: Date.now() + 3600000,
+        clientId: "",
+        clientSecret: "",
+        region: "us-east-1",
+        authMethod: "desktop",
+      });
+      const creds = (await interactiveLogin(makeCallbacks(""))) as KiroCredentials;
+      expect(vi.mocked(runSocialDeviceFlow)).toHaveBeenCalledWith(expect.anything(), "github");
+      expect(creds.authMethod).toBe("desktop");
     });
 
     it("kiro-cli social login uses device flow so headless hosts (SSH/JupyterLab) can complete it", async () => {

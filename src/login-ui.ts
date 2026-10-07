@@ -16,6 +16,8 @@ export type LoginChoice =
   | { method: "builder-id" }
   | { method: "google" }
   | { method: "github" }
+  | { method: "google-device" }
+  | { method: "github-device" }
   | { method: "idc"; startUrl: string; region?: string }
   | { method: "apikey"; apiKey: string }
   | null; // cancelled
@@ -54,6 +56,16 @@ export async function showLoginUI(hasCached?: boolean): Promise<LoginChoice> {
       mainItems.push(
         { value: "apikey", label: "API Key", description: "Use a KIRO_API_KEY (ksk_...)" },
         { value: "personal", label: "Web Login", description: "Sign in via browser (Google, GitHub, Builder ID)" },
+        {
+          value: "google-device",
+          label: "Google (device flow)",
+          description: "Headless: confirm a code on any device",
+        },
+        {
+          value: "github-device",
+          label: "GitHub (device flow)",
+          description: "Headless: confirm a code on any device",
+        },
         { value: "idc", label: "Device Code", description: "IAM Identity Center" },
       );
 
@@ -83,6 +95,8 @@ export async function showLoginUI(hasCached?: boolean): Promise<LoginChoice> {
           switchToApiKeyInput();
         } else if (item.value === "personal") {
           done({ method: "personal" });
+        } else if (item.value === "google-device" || item.value === "github-device") {
+          done({ method: item.value });
         } else {
           done({ method: "cached" });
         }

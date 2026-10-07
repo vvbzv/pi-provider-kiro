@@ -34,8 +34,8 @@ Then log in from pi:
 The login flow supports:
 - **AWS Builder ID** — native device-code flow, works well over SSH/remotes
 - **Your organization** — IAM Identity Center start URL
-- **Google** — social login via `kiro-cli`
-- **GitHub** — social login via `kiro-cli`
+- **Google / GitHub (device flow)** — native device-code login: approve a code on any device. Works headless (SSH, containers, JupyterLab), no `kiro-cli` required
+- **Web Login** — browser-redirect PKCE login with a localhost callback; use it when the browser runs on the same machine as pi
 
 If your organization uses an external identity provider (e.g. Okta) through Kiro, log in once with
 `kiro-cli login` and the provider reuses that session — no separate pi login needed.

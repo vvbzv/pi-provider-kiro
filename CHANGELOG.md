@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Native Google/GitHub device-code login: `/login kiro` now offers "Google (device flow)" and "GitHub (device flow)". Approve a code in any browser — no loopback callback and no `kiro-cli`, so social login works on headless hosts (SSH, containers, JupyterLab/SageMaker). Uses Kiro's social auth service (`/oauth/device/authorization` + `/oauth/device/poll`), the same wire contract `kiro-cli` uses in remote environments.
+
 ### Changed
 
-- Google/GitHub login via `kiro-cli` now passes `--use-device-flow` and waits up to 10 minutes (was 2). The browser-redirect flow can't complete on headless hosts (SSH, JupyterLab/SageMaker), and 2 minutes was shorter than a device code's lifetime.
+- Google/GitHub login delegated to `kiro-cli` now passes `--use-device-flow` and waits up to 10 minutes (was 2), matching the device-code lifetime.
 
 - esbuild is now a devDependency (build-only); bumped to 0.28.2. It only produces `dist/index.js` and nothing in the published bundle imports it, yet as a runtime dependency every consumer installed esbuild 0.25.12 and its platform binary. Pinned exactly to match pi 0.87.1 (`@earendil-works/chord`). Both lockfiles now resolve a single esbuild (vite is deduped onto 0.28.2 too). `test/packaging.test.ts` pins esbuild's absence from `dependencies`.
 
