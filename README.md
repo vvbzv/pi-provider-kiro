@@ -25,6 +25,22 @@ Or install it globally with npm:
 npm install -g pi-provider-kiro
 ```
 
+### Install from a GitHub zip download
+
+Download the branch zip:
+<https://github.com/vvbzv/pi-provider-kiro/archive/refs/heads/feat/kiro-cli-device-flow.zip>
+
+```bash
+unzip pi-provider-kiro-feat-kiro-cli-device-flow.zip
+cd pi-provider-kiro-feat-kiro-cli-device-flow
+npm install        # also builds dist/index.js (via the prepare hook)
+pi install "$PWD"
+```
+
+The zip contains source only — `dist/` is not tracked, so the build step is required.
+Keep the extracted folder where it is: pi installs from that directory. If
+`dist/index.js` is missing afterwards, run `npm run build`.
+
 Then log in from pi:
 
 ```text
