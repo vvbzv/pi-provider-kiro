@@ -113,6 +113,29 @@ describe("Feature 10: Interactive Login", () => {
       expect(((await interactiveLogin(makeCallbacks(""))) as KiroCredentials).authMethod).toBe("desktop");
     });
 
+    it("kiro-cli social login uses device flow so headless hosts (SSH/JupyterLab) can complete it", async () => {
+      const { execFileSync } = await import("node:child_process");
+      vi.mocked(execFileSync).mockClear();
+      const { showLoginUI } = await import("../src/login-ui.js");
+      vi.mocked(showLoginUI).mockResolvedValueOnce({ method: "google" });
+      const { getKiroCliSocialToken } = await import("../src/kiro-cli.js");
+      vi.mocked(getKiroCliSocialToken).mockReturnValueOnce({
+        refresh: "rt|desktop",
+        access: "at",
+        expires: Date.now() + 3600000,
+        clientId: "",
+        clientSecret: "",
+        region: "us-east-1",
+        authMethod: "desktop",
+      });
+      await interactiveLogin(makeCallbacks(""));
+      const [cmd, args, opts] = vi.mocked(execFileSync).mock.calls[0];
+      expect(cmd).toBe("kiro-cli");
+      expect(args).toContain("--use-device-flow");
+      // Device codes live ~10 min; a 2 min timeout killed logins mid-confirmation.
+      expect((opts as { timeout: number }).timeout).toBeGreaterThanOrEqual(600000);
+    });
+
     it("TUI: github → kiro-cli GitHub", async () => {
       const { showLoginUI } = await import("../src/login-ui.js");
       vi.mocked(showLoginUI).mockResolvedValueOnce({ method: "github" });

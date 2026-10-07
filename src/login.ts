@@ -527,8 +527,10 @@ export async function loginViaKiroCli(
   getProgress(callbacks)?.(`Initiating ${provider} login via kiro-cli...`);
 
   try {
-    execFileSync("kiro-cli", ["login", "--license", "free"], {
-      timeout: 120000,
+    // Device flow: works on headless hosts (SSH, JupyterLab) where a localhost
+    // browser redirect can't complete. 10 min covers the device-code lifetime.
+    execFileSync("kiro-cli", ["login", "--license", "free", "--use-device-flow"], {
+      timeout: 600000,
       stdio: "inherit",
     });
   } catch (error) {
